@@ -25,7 +25,7 @@ def predict(data: InputData):
 
         # Aplicando os codificadores às variáveis categóricas
               
-        for col in ['acao_cobranca', 'status_pagamento', 'dia_semana_cobranca']:
+        for col in ['acao_cobranca', 'dia_semana_cobranca']:
             if col in encoders:
                 le = encoders[col]
                 if input_dict[col] in le.classes_:
@@ -45,11 +45,9 @@ def predict(data: InputData):
             input_dict['tamanho_ies'],
             input_dict['qtd_cursos_na_ies'],
             input_dict['alunos_por_curso_ies'],
-            input_dict['mais_de_um_curso'],
             input_dict['dia_semana_cobranca'],
             input_dict['semana_do_mes'],
-            input_dict['acao_cobranca'],
-            input_dict['status_pagamento']
+            input_dict['acao_cobranca']
         ]])
 
         # Realizando a previsão
