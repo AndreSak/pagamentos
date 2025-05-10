@@ -10,7 +10,7 @@ class InputData(BaseModel):
     qtd_cursos_na_ies: int
     alunos_por_curso_ies: float
     mais_de_um_curso: int
-    dia_semana_cobranca: int
+    dia_semana_cobranca: str
     semana_do_mes: int
     acao_cobranca: str
     status_pagamento: str
