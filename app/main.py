@@ -24,7 +24,8 @@ def predict(data: InputData):
         input_dict = data.dict()
 
         # Aplicando os codificadores às variáveis categóricas
-        for col in ['acao_cobranca', 'status_pagamento']:
+              
+        for col in ['acao_cobranca', 'status_pagamento', 'dia_semana_cobranca']:
             if col in encoders:
                 le = encoders[col]
                 if input_dict[col] in le.classes_:
