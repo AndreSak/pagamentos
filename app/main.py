@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from app.schemas import InputData
 import joblib
-import numpy as np
+import pandas as pd
 import os
 
 app = FastAPI(title="API de Previsão de Pagamentos")
@@ -20,11 +20,10 @@ except Exception as e:
 @app.post("/predict")
 def predict(data: InputData):
     try:
-        # Convertendo os dados de entrada para um dicionário
+        # Convertendo os dados de entrada para dicionário
         input_dict = data.dict()
 
-        # Aplicando os codificadores às variáveis categóricas
-              
+        # Aplicando os encoders para colunas categóricas
         for col in ['acao_cobranca', 'dia_semana_cobranca']:
             if col in encoders:
                 le = encoders[col]
@@ -35,28 +34,24 @@ def predict(data: InputData):
             else:
                 raise ValueError(f"Codificador não encontrado para {col}")
 
-        # Criando o array de entrada para o modelo
-        input_array = np.array([[
-            input_dict['valor_cobrado'],
-            input_dict['lead_lag_vencimento'],
-            input_dict['numero_cobrancas'],
-            input_dict['parcelas_em_atraso_acumuladas'],
-            input_dict['dias_desde_ultima_cobranca'],
-            input_dict['tamanho_ies'],
-            input_dict['qtd_cursos_na_ies'],
-            input_dict['alunos_por_curso_ies'],
-            input_dict['dia_semana_cobranca'],
-            input_dict['semana_do_mes'],
-            input_dict['acao_cobranca']
-        ]])
+        # Ordem esperada das features
+        feature_order = [
+            'valor_cobrado', 'lead_lag_vencimento', 'numero_cobrancas',
+            'parcelas_em_atraso_acumuladas', 'dias_desde_ultima_cobranca',
+            'tamanho_ies', 'qtd_cursos_na_ies', 'alunos_por_curso_ies',
+            'dia_semana_cobranca', 'semana_do_mes', 'acao_cobranca'
+        ]
 
-        # Realizando a previsão
-        prediction = model.predict(input_array)
-        probability = model.predict_proba(input_array)[0][1]
+        # Criar o DataFrame com as colunas na ordem correta
+        df_input = pd.DataFrame([[input_dict[feat] for feat in feature_order]], columns=feature_order)
+
+        # Realizando a predição
+        prediction = model.predict(df_input)[0]
+        probability = model.predict_proba(df_input)[0][1]
 
         return {
-            "prediction": int(prediction[0]),
-            "probability": float(probability)
+            "prediction": int(prediction),
+            "probabilidade_pagamento": round(float(probability), 4)
         }
 
     except ValueError as ve:
