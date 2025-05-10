@@ -4,3 +4,4 @@ joblib
 lightgbm
 numpy
 pydantic
+scikit-learn
